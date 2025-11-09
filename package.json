@@ -1,0 +1,150 @@
+{
+  "name": "punto-de-ventas-plus",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Sistema de Punto de Ventas con facturación AFIP integrada",
+  "author": "Kiosco Santi",
+  "main": "electron-main.js",
+  "sideEffects": [
+    "./src/views/InformesView2.tsx",
+    "./views/InformesView2.tsx"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "dev:firebase": "vite & firebase emulators:start",
+    "server": "node server.js",
+    "start:afip": "node facturacion-server.js",
+    "start:email": "node email-server.js",
+    "dev:local": "concurrently \"npm run server\" \"npm run dev\" \"npm run start:afip\"",
+    "start": "node railway-server.js",
+    "build": "npx prisma generate",
+    "build:vercel": "vite build",
+    "build:fast": "vite build",
+    "build:vite": "tsc && vite build",
+    "build:webpack": "tsc && webpack --mode=production",
+    "preview": "vite preview",
+    "firebase:serve": "firebase emulators:start",
+    "firebase:deploy": "firebase deploy",
+    "firebase:functions": "firebase deploy --only functions",
+    "railway:build": "npx prisma generate",
+    "railway:start": "node railway-server.js",
+    "railway:migrate": "npx prisma db push",
+    "railway:seed": "node scripts/seed-railway.js",
+    "tauri:build": "npx @tauri-apps/cli@1 build",
+    "nw:prepare": "powershell -NoProfile -Command \"$dst='nwapp/app'; if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }; New-Item -ItemType Directory -Force -Path $dst > $null; Copy-Item -Recurse -Force 'dist/*' $dst\"",
+    "nw:build": "nwbuild -p win64 -o release-nw nwapp",
+    "nw:zip": "powershell -NoProfile -Command Compress-Archive -Path 'release-nw/win64/*' -DestinationPath 'release-nw/Kiosco-NWJS-Portable.zip' -Force",
+    "nw:build:all": "npm run build:fast && npm run nw:prepare && npm run nw:build && npm run nw:zip",
+    "import:proveedores": "node scripts/import_proveedores.mjs",
+    "electron:dev": "electron .",
+    "electron:build": "npm run build && electron-builder",
+    "electron:build:win": "vite build && electron-builder --win --x64",
+    "pack": "npm run build && electron-builder --dir"
+  },
+  "dependencies": {
+    "@google/genai": "^0.11.0",
+    "@prisma/client": "^6.19.0",
+    "@tauri-apps/api": "^1.5.3",
+    "@types/crypto-js": "^4.2.2",
+    "axios": "^1.7.2",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dexie": "^4.0.8",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "fast-xml-parser": "^4.4.0",
+    "firebase": "^12.5.0",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^6.6.0",
+    "jspdf-autotable": "^5.0.2",
+    "nodemailer": "^6.9.15",
+    "pdfjs-dist": "^4.10.38",
+    "pg": "^8.16.3",
+    "prisma": "^6.19.0",
+    "qrcode": "^1.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "ws": "^8.18.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/ws": "^8.5.10",
+    "@vitejs/plugin-react": "^4.3.1",
+    "copy-webpack-plugin": "^13.0.1",
+    "css-loader": "^7.1.2",
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.12",
+    "html-webpack-plugin": "^5.6.4",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.5.3",
+    "vite": "^7.1.9",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "build": {
+    "appId": "com.kiosco.puntoventas",
+    "productName": "Kiosco Punto de Ventas",
+    "asar": false,
+    "buildDependenciesFromSource": false,
+    "npmRebuild": false,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron-main.js",
+      "server.js",
+      "facturacion-server.js",
+      "email-server.js",
+      "command-server.js",
+      "afip-service.js",
+      "email-service.js",
+      "db.json",
+      "metadata.json",
+      "afip_certs/**/*",
+      "Icono/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "afip_certs",
+        "to": "afip_certs"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-Setup.${ext}"
+    },
+    "msi": {
+      "oneClick": false,
+      "perMachine": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Kiosco Punto de Ventas"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Kiosco Punto de Ventas"
+    }
+  }
+}
